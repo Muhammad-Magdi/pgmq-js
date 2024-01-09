@@ -26,5 +26,14 @@ export class QueueManager {
     const query = "SELECT pgmq.drop_queue($1)";
     await this.pool.query(query, [name]);
   }
+
+  public async purge(name: string) {
+    const query = "SELECT pgmq.purge_queue($1)";
+    await this.pool.query(query, [name]);
+  }
+
+  public async detachArchive(name: string) {
+    const query = "SELECT pgmq.detach_archive($1)";
+    await this.pool.query(query, [name]);
   }
 }

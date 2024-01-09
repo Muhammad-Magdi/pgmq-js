@@ -115,4 +115,20 @@ describe("QueueManager", () => {
       await expect(pgmq.queue.drop(qName)).rejects.toThrow();
     });
   });
+
+  describe("purge", () => {
+    it("does not throw", async () => {
+      const qName = faker.string.alpha(10);
+      await pgmq.queue.create(qName);
+      await pgmq.queue.purge(qName);
+    });
+  });
+
+  describe("detachArchive", () => {
+    it("does not throw", async () => {
+      const qName = faker.string.alpha(10);
+      await pgmq.queue.create(qName);
+      await pgmq.queue.detachArchive(qName);
+    });
+  });
 });
