@@ -100,17 +100,19 @@ describe("QueueManager", () => {
   });
 
   describe("drop", () => {
-    it("drops a queue", async () => {
+    it("drops the queue", async () => {
       const qName = faker.string.alpha(10);
       await pgmq.queue.create(qName);
-      const queuesBeforeDropping = await pgmq.queue.list();
-      expect(queuesBeforeDropping).toContainEqual(newQueue(qName));
 
       await pgmq.queue.drop(qName);
-      const queuesAfterDropping = await pgmq.queue.list();
-      expect(queuesAfterDropping).not.toContainEqual(newQueue(qName));
+
+      const queues = await pgmq.queue.list();
+      expect(queues).not.toContainEqual(newQueue(qName));
     });
 
-    it.todo("does not drop a queue that does not exist");
+    it("fails to drop non-existing queue", async () => {
+      const qName = faker.string.alpha(10);
+      await expect(pgmq.queue.drop(qName)).rejects.toThrow();
+    });
   });
 });
