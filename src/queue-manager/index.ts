@@ -16,6 +16,7 @@ export class QueueManager {
     const query = "SELECT pgmq.create($1)";
     await this.pool.query(query, [name]);
   }
+
   public async drop(name: string) {
     await this.pool.query("SELECT pgmq.drop_queue($1)", [name]);
   }

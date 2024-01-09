@@ -4,18 +4,43 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/index.ts"
+    "start": "ts-node src/index.ts",
+    "test": "jest",
+    "test:watch": "jest --watch --detectOpenHandles"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@faker-js/faker": "^8.3.1",
+    "@types/jest": "^29.5.11",
     "@types/pg-pool": "^2.0.6",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
     "typescript": "^5.3.3"
   },
   "dependencies": {
     "pg": "^8.11.3",
     "pg-pool": "^3.6.1",
     "ts-node": "^10.9.2"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1"
+    }
   }
 }
