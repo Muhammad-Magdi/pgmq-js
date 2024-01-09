@@ -21,10 +21,10 @@ describe("QueueManager", () => {
 
   beforeEach(async () => await deleteAllQueues(pgmq));
 
-  const queueNamed = (name: string) => ({
+  const newQueue = (name: string, isUnlogged = false) => ({
     name,
     isPartitioned: false,
-    isUnlogged: false,
+    isUnlogged,
     createdAt: expect.any(Date),
   });
 
@@ -40,7 +40,7 @@ describe("QueueManager", () => {
 
       const queues = await pgmq.queue.list();
 
-      expect(queues).toEqual([queueNamed(qName)]);
+      expect(queues).toEqual([newQueue(qName)]);
     });
 
     it("returns a list of queues; multiple queues", async () => {
@@ -56,9 +56,9 @@ describe("QueueManager", () => {
       const queues = await pgmq.queue.list();
 
       expect(queues).toHaveLength(3);
-      expect(queues).toContainEqual(queueNamed(qName1));
-      expect(queues).toContainEqual(queueNamed(qName2));
-      expect(queues).toContainEqual(queueNamed(qName3));
+      expect(queues).toContainEqual(newQueue(qName1));
+      expect(queues).toContainEqual(newQueue(qName2));
+      expect(queues).toContainEqual(newQueue(qName3));
     });
   });
 
@@ -68,10 +68,35 @@ describe("QueueManager", () => {
       await pgmq.queue.create(qName);
 
       const queues = await pgmq.queue.list();
-      expect(queues).toContainEqual(queueNamed(qName));
+      expect(queues).toContainEqual(newQueue(qName));
     });
 
-    it.todo("rejects existing queue names");
+    it("rejects existing queue names", async () => {
+      const qName = faker.string.alpha(10);
+      await pgmq.queue.create(qName);
+      await expect(pgmq.queue.create(qName)).rejects.toThrow();
+    });
+  });
+
+  describe("createUnlogged", () => {
+    it("creates an unlogged queue", async () => {
+      const qName = faker.string.alpha(10);
+
+      await pgmq.queue.createUnlogged(qName);
+
+      const queues = await pgmq.queue.list();
+      expect(queues).toContainEqual(newQueue(qName, true));
+    });
+
+    it("fails to create an unlogged queue with the same name as an existing logged queue", async () => {
+      const qName = faker.string.alpha(10);
+      await pgmq.queue.create(qName);
+
+      await expect(pgmq.queue.createUnlogged(qName)).rejects.toThrow();
+
+      const queues = await pgmq.queue.list();
+      expect(queues).toContainEqual(newQueue(qName));
+    });
   });
 
   describe("drop", () => {
@@ -79,11 +104,11 @@ describe("QueueManager", () => {
       const qName = faker.string.alpha(10);
       await pgmq.queue.create(qName);
       const queuesBeforeDropping = await pgmq.queue.list();
-      expect(queuesBeforeDropping).toContainEqual(queueNamed(qName));
+      expect(queuesBeforeDropping).toContainEqual(newQueue(qName));
 
       await pgmq.queue.drop(qName);
       const queuesAfterDropping = await pgmq.queue.list();
-      expect(queuesAfterDropping).not.toContainEqual(queueNamed(qName));
+      expect(queuesAfterDropping).not.toContainEqual(newQueue(qName));
     });
 
     it.todo("does not drop a queue that does not exist");
