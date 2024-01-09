@@ -8,9 +8,13 @@ import {
   DEFAULT_MAX_USES,
   DEFAULT_SSL,
 } from "./constants";
+import { QueueManager } from "./queue-manager";
 
 export class Pgmq {
+  public readonly queue: QueueManager;
+
   private constructor(private readonly pool: Pool<Client>) {
+    this.queue = new QueueManager(pool);
   }
 
   public static async new(c: PgPoolConfig) {
