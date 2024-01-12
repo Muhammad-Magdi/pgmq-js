@@ -19,6 +19,10 @@ describe("MsgManager", () => {
     await pgmq.queue.create(qName);
   });
 
+  const expectEmptyQueue = async (qName: string) => {
+    await expect(pgmq.msg.pop(qName)).resolves.toBeUndefined();
+  };
+
   const deleteMessage = async (qName: string, id: number) => {
     await expect(pgmq.msg.delete(qName, id)).resolves.toBe(true);
   };
@@ -149,6 +153,30 @@ describe("MsgManager", () => {
     it("returns an empty array; queue is empty", async () => {
       const msgs = await pgmq.msg.readBatch<number>(qName, 0, 2);
       expect(msgs).toEqual([]);
+    });
+  });
+
+  describe("pop", () => {
+    it("returns a message with its metadata", async () => {
+      type T = { id: number; msg: string; date: Date; isGood: boolean };
+      const msg = { id: 1, msg: "msg", isGood: true };
+      await pgmq.msg.send(qName, msg);
+
+      const readMsg = await pgmq.msg.pop<T>(qName);
+
+      expect(readMsg).toEqual(newMsg(msg));
+    });
+
+    it("deletes the message so that it can't be read again", async () => {
+      const msg = "msg";
+      await pgmq.msg.send(qName, msg);
+      await pgmq.msg.pop(qName);
+      await expectEmptyQueue(qName);
+    });
+
+    it("returns undefined; queue is empty", async () => {
+      const msg = await pgmq.msg.pop(qName);
+      expect(msg).toEqual(undefined);
     });
   });
 

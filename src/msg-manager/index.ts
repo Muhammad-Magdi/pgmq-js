@@ -41,7 +41,13 @@ export class MsgManager extends QueryExecuter {
   ): Promise<Message<T>[]> {
     const query = "SELECT * FROM pgmq.read($1, $2, $3)";
     const res = await this.executeQuery<DbMessage>(query, [q, vt, numMessages]);
-    return res.rows.flatMap(parseDbMessage<T>);
+    return res.rows.flatMap(parseDbMessage<T>) as Message<T>[];
+  }
+
+  public async pop<T>(q: string): Promise<Message<T> | undefined> {
+    const query = "SELECT * FROM pgmq.pop($1)";
+    const res = await this.executeQuery<DbMessage>(query, [q]);
+    return parseDbMessage(res.rows[0]);
   }
 
   public async delete(q: string, msgId: number): Promise<boolean> {
