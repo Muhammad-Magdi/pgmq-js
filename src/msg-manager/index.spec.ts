@@ -13,7 +13,9 @@ describe("MsgManager", () => {
       user: "postgres",
       ssl: false,
     });
+  });
 
+  beforeEach(async () => {
     await pgmq.queue.create(qName);
   });
 
@@ -76,8 +78,6 @@ describe("MsgManager", () => {
 
   describe("read", () => {
     it("returns a message with its metadata", async () => {
-      const qName = faker.string.alpha(10);
-      await pgmq.queue.create(qName);
       type T = { id: number; msg: string; date: Date; isGood: boolean };
       const msg = { id: 1, msg: "msg", isGood: true };
       await pgmq.msg.send(qName, msg);
@@ -85,24 +85,14 @@ describe("MsgManager", () => {
       const readMsg = await pgmq.msg.read<T>(qName);
 
       expect(readMsg).toEqual(newMsg(msg));
-
-      await pgmq.queue.drop(qName);
     });
 
     it("returns undefined; queue is empty", async () => {
-      const emptyQName = faker.string.alpha(10);
-      await pgmq.queue.create(emptyQName);
-
-      const msg = await pgmq.msg.read(emptyQName);
-
+      const msg = await pgmq.msg.read(qName);
       expect(msg).toEqual(undefined);
-
-      await pgmq.queue.drop(emptyQName);
     });
 
     it("returns undefined; all the messages are read", async () => {
-      const qName = faker.string.alpha(10);
-      await pgmq.queue.create(qName);
       await pgmq.msg.sendBatch(qName, [1, 2]);
 
       const msg1 = await pgmq.msg.read<number>(qName);
@@ -114,16 +104,12 @@ describe("MsgManager", () => {
       expect(msg1).toEqual(newMsg(1));
       expect(msg2).toEqual(newMsg(2));
       expect(msg3).toEqual(undefined);
-
-      await pgmq.queue.drop(qName);
     });
 
     it('does not read a read message within the "vt" window', async () => {
       const delay = (ms: number) =>
         new Promise((resolve) => setTimeout(resolve, ms));
 
-      const qName = faker.string.alpha(10);
-      await pgmq.queue.create(qName);
       type T = { id: number; msg: string; date: Date; isGood: boolean };
       const msg = { id: 1, msg: "msg", isGood: true };
       await pgmq.msg.send(qName, msg);
@@ -136,27 +122,19 @@ describe("MsgManager", () => {
       await delay(vt * 1000);
       const readMsg2 = await pgmq.msg.read<T>(qName, vt);
       expect(readMsg2).toEqual(newMsg(msg));
-
-      await pgmq.queue.drop(qName);
     });
 
     it('rejects floating points in the "vt" window', async () => {
-      const qName = faker.string.alpha(10);
-      await pgmq.queue.create(qName);
       type T = { id: number; msg: string; date: Date; isGood: boolean };
       const msg = { id: 1, msg: "msg", isGood: true };
       await pgmq.msg.send(qName, msg);
 
       await expect(() => pgmq.msg.read<T>(qName, 1.5)).rejects.toThrow();
-
-      await pgmq.queue.drop(qName);
     });
   });
 
   describe("readBatch", () => {
     it("returns an array of messages with their metadata", async () => {
-      const qName = faker.string.alpha(10);
-      await pgmq.queue.create(qName);
       type T = { id: number; msg: string; date: Date; isGood: boolean };
       const msg1 = { id: 1, msg: "msg", isGood: true };
       const msg2 = { id: 1, msg: "msg", isGood: true };
@@ -166,39 +144,25 @@ describe("MsgManager", () => {
 
       expect(readMsg1).toEqual(newMsg(msg1));
       expect(readMsg2).toEqual(newMsg(msg2));
-
-      await pgmq.queue.drop(qName);
     });
 
     it("returns an empty array; queue is empty", async () => {
-      const qName = faker.string.alpha(10);
-      await pgmq.queue.create(qName);
-
       const msgs = await pgmq.msg.readBatch<number>(qName, 0, 2);
-
       expect(msgs).toEqual([]);
-
-      await pgmq.queue.drop(qName);
     });
   });
 
   describe("delete", () => {
     it("returns true if message is deleted", async () => {
-      const qName = faker.string.alpha(10);
-      await pgmq.queue.create(qName);
       const msg = "msg";
       const id = await pgmq.msg.send(qName, msg);
 
       const deleted = await pgmq.msg.delete(qName, id);
 
       expect(deleted).toBe(true);
-
-      await pgmq.queue.drop(qName);
     });
 
     it("deletes the message so that it can't be read again", async () => {
-      const qName = faker.string.alpha(10);
-      await pgmq.queue.create(qName);
       const msg = "msg";
       const id = await pgmq.msg.send(qName, msg);
 
@@ -207,23 +171,15 @@ describe("MsgManager", () => {
       expect(deleted).toBe(true);
       const read = await pgmq.msg.read<string>(qName);
       expect(read).toBeUndefined();
-
-      await pgmq.queue.drop(qName);
     });
 
     it("returns false if no such message id", async () => {
-      const qName = faker.string.alpha(10);
-      await pgmq.queue.create(qName);
-
       const deleted = await pgmq.msg.delete(qName, 1);
-
       expect(deleted).toBe(false);
-
-      await pgmq.queue.drop(qName);
     });
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await pgmq.queue.drop(qName);
   });
 });
