@@ -1,14 +1,8 @@
-import { Client } from 'pg';
-import Pool from 'pg-pool';
 import { parseDbMessage } from './helpers';
 import { DbMessage, Message } from 'src/msg-manager/types';
 import { QueryExecuter } from 'src/query-executer';
 
 export class MsgManager extends QueryExecuter {
-  constructor(pool: Pool<Client>) {
-    super(pool);
-  }
-
   public async send<T>(q: string, msg: T, delay = 0): Promise<number> {
     const query = 'SELECT * FROM pgmq.send($1, $2, $3)';
     const res = await this.executeQuery<{ send: number }>(query, [q, JSON.stringify(msg), delay]);

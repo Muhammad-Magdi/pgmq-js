@@ -1,14 +1,8 @@
-import { Client } from 'pg';
-import Pool from 'pg-pool';
 import { parseDbQueue } from './helpers';
 import { Queue } from './types';
 import { QueryExecuter } from 'src/query-executer';
 
 export class QueueManager extends QueryExecuter {
-  constructor(pool: Pool<Client>) {
-    super(pool);
-  }
-
   public async list(): Promise<Queue[]> {
     const query = 'SELECT pgmq.list_queues()';
     const { rows } = await this.executeQuery<{ list_queues: string }>(query);

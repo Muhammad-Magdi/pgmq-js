@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { faker } from '@faker-js/faker';
 import { Pgmq } from '../index';
 
@@ -82,7 +83,12 @@ describe('MsgManager', () => {
 
   describe('read', () => {
     it('returns a message with its metadata', async () => {
-      type T = { id: number; msg: string; date: Date; isGood: boolean };
+      interface T {
+        id: number;
+        msg: string;
+        date: Date;
+        isGood: boolean;
+      }
       const msg = { id: 1, msg: 'msg', isGood: true };
       await pgmq.msg.send(qName, msg);
 
@@ -113,7 +119,12 @@ describe('MsgManager', () => {
     it('does not read a read message within the "vt" window', async () => {
       const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-      type T = { id: number; msg: string; date: Date; isGood: boolean };
+      interface T {
+        id: number;
+        msg: string;
+        date: Date;
+        isGood: boolean;
+      }
       const msg = { id: 1, msg: 'msg', isGood: true };
       await pgmq.msg.send(qName, msg);
       const vt = 1;
@@ -128,7 +139,12 @@ describe('MsgManager', () => {
     });
 
     it('rejects floating points in the "vt" window', async () => {
-      type T = { id: number; msg: string; date: Date; isGood: boolean };
+      interface T {
+        id: number;
+        msg: string;
+        date: Date;
+        isGood: boolean;
+      }
       const msg = { id: 1, msg: 'msg', isGood: true };
       await pgmq.msg.send(qName, msg);
 
@@ -138,7 +154,12 @@ describe('MsgManager', () => {
 
   describe('readBatch', () => {
     it('returns an array of messages with their metadata', async () => {
-      type T = { id: number; msg: string; date: Date; isGood: boolean };
+      interface T {
+        id: number;
+        msg: string;
+        date: Date;
+        isGood: boolean;
+      }
       const msg1 = { id: 1, msg: 'msg', isGood: true };
       const msg2 = { id: 1, msg: 'msg', isGood: true };
       await pgmq.msg.sendBatch(qName, [msg1, msg2]);
@@ -157,7 +178,12 @@ describe('MsgManager', () => {
 
   describe('pop', () => {
     it('returns a message with its metadata', async () => {
-      type T = { id: number; msg: string; date: Date; isGood: boolean };
+      interface T {
+        id: number;
+        msg: string;
+        date: Date;
+        isGood: boolean;
+      }
       const msg = { id: 1, msg: 'msg', isGood: true };
       await pgmq.msg.send(qName, msg);
 

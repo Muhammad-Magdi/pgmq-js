@@ -19,12 +19,15 @@ describe('QueueManager', () => {
     });
   });
 
-  beforeEach(async () => await deleteAllQueues(pgmq));
+  beforeEach(async () => {
+    await deleteAllQueues(pgmq);
+  });
 
   const newQueue = (name: string, isUnlogged = false) => ({
     name,
     isPartitioned: false,
     isUnlogged,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     createdAt: expect.any(Date),
   });
 

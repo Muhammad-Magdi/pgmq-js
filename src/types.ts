@@ -1,4 +1,4 @@
-export type PgPoolConfig = {
+export interface PgPoolConfig {
   host: string;
   database: string;
   user: string;
@@ -9,4 +9,4 @@ export type PgPoolConfig = {
   idleTimeoutMillis?: number;
   connectionTimeoutMillis?: number;
   maxUses?: number;
-};
+}
