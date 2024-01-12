@@ -1,0 +1,6 @@
+# Built files:
+dist
+
+# Auto-generated files:
+node_modules
+coverage
