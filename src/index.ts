@@ -9,12 +9,15 @@ import {
   DEFAULT_SSL,
 } from "./constants";
 import { QueueManager } from "./queue-manager";
+import { MsgManager } from "./msg-manager";
 
 export class Pgmq {
   public readonly queue: QueueManager;
+  public readonly msg: MsgManager;
 
   private constructor(private readonly pool: Pool<Client>) {
     this.queue = new QueueManager(pool);
+    this.msg = new MsgManager(pool);
   }
 
   public static async new(c: PgPoolConfig) {
