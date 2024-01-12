@@ -182,6 +182,47 @@ describe("MsgManager", () => {
     });
   });
 
+  describe("delete", () => {
+    it("returns true if message is deleted", async () => {
+      const qName = faker.string.alpha(10);
+      await pgmq.queue.create(qName);
+      const msg = "msg";
+      const id = await pgmq.msg.send(qName, msg);
+
+      const deleted = await pgmq.msg.delete(qName, id);
+
+      expect(deleted).toBe(true);
+
+      await pgmq.queue.drop(qName);
+    });
+
+    it("deletes the message so that it can't be read again", async () => {
+      const qName = faker.string.alpha(10);
+      await pgmq.queue.create(qName);
+      const msg = "msg";
+      const id = await pgmq.msg.send(qName, msg);
+
+      const deleted = await pgmq.msg.delete(qName, id);
+
+      expect(deleted).toBe(true);
+      const read = await pgmq.msg.read<string>(qName);
+      expect(read).toBeUndefined();
+
+      await pgmq.queue.drop(qName);
+    });
+
+    it("returns false if no such message id", async () => {
+      const qName = faker.string.alpha(10);
+      await pgmq.queue.create(qName);
+
+      const deleted = await pgmq.msg.delete(qName, 1);
+
+      expect(deleted).toBe(false);
+
+      await pgmq.queue.drop(qName);
+    });
+  });
+
   afterAll(async () => {
     await pgmq.queue.drop(qName);
   });
