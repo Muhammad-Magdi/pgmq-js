@@ -9,13 +9,13 @@ export class MsgManager extends QueryExecuter {
     super(pool);
   }
 
-  public async send(q: string, msg: any, delay = 0): Promise<number> {
+  public async send<T>(q: string, msg: T, delay = 0): Promise<number> {
     const query = 'SELECT * FROM pgmq.send($1, $2, $3)';
     const res = await this.executeQuery<{ send: number }>(query, [q, JSON.stringify(msg), delay]);
     return res.rows[0].send;
   }
 
-  public async sendBatch(q: string, msgs: any[], delay = 0): Promise<number[]> {
+  public async sendBatch<T>(q: string, msgs: T[], delay = 0): Promise<number[]> {
     const query = 'SELECT * FROM pgmq.send_batch($1, $2::jsonb[], $3)';
     const res = await this.executeQuery<{ send_batch: number }>(query, [
       q,

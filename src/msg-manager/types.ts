@@ -1,5 +1,3 @@
-export type Json = Record<string, any>;
-
 export type Message<T> = {
   msgId: number;
   readCount: number;
