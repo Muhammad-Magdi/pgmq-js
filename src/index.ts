@@ -1,15 +1,15 @@
-import { Client } from "pg";
-import Pool from "pg-pool";
-import { PgPoolConfig } from "./types";
+import { Client } from 'pg';
+import Pool from 'pg-pool';
+import { PgPoolConfig } from './types';
 import {
   DEFAULT_CONNECTION_TIMEOUT_MILLIS,
   DEFAULT_IDLE_TIMEOUT_MILLIS,
   DEFAULT_MAX_POOL_SIZE,
   DEFAULT_MAX_USES,
   DEFAULT_SSL,
-} from "./constants";
-import { QueueManager } from "./queue-manager";
-import { MsgManager } from "./msg-manager";
+} from './constants';
+import { QueueManager } from './queue-manager';
+import { MsgManager } from './msg-manager';
 
 export class Pgmq {
   public readonly queue: QueueManager;
@@ -37,6 +37,6 @@ export class Pgmq {
   }
 
   private async prepare() {
-    await this.pool.query("CREATE EXTENSION IF NOT EXISTS pgmq CASCADE");
+    await this.pool.query('CREATE EXTENSION IF NOT EXISTS pgmq CASCADE;');
   }
 }

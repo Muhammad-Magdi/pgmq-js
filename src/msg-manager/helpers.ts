@@ -1,4 +1,4 @@
-import { DbMessage, Message } from "./types";
+import { DbMessage, Message } from './types';
 
 export const parseDbMessage = <T>(m?: DbMessage): Message<T> | undefined => {
   if (m == null) return m;
