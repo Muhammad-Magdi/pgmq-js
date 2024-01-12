@@ -49,4 +49,10 @@ export class MsgManager extends QueryExecuter {
     const res = await this.executeQuery<{ delete: boolean }>(query, [q, msgId]);
     return res.rows[0].delete;
   }
+
+  public async deleteBatch(q: string, msgIds: number[]): Promise<number[]> {
+    const query = "SELECT pgmq.delete($1, $2::bigint[])";
+    const res = await this.executeQuery<{ delete: number }>(query, [q, msgIds]);
+    return res.rows.flatMap((d) => d.delete);
+  }
 }

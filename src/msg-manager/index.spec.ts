@@ -179,6 +179,44 @@ describe("MsgManager", () => {
     });
   });
 
+  describe("deleteBatch", () => {
+    it("returns the message ids that were deleted", async () => {
+      const msg1 = "msg1";
+      const msg2 = "msg2";
+      const [id1, id2] = await pgmq.msg.sendBatch(qName, [msg1, msg2]);
+
+      const [dId1, dId2] = await pgmq.msg.deleteBatch(qName, [id1, id2]);
+
+      expect(dId1).toBe(id1);
+      expect(dId2).toBe(id2);
+    });
+
+    it("deletes the messages so that they can't be read again", async () => {
+      const msg1 = "msg1";
+      const msg2 = "msg2";
+      const [id1, id2] = await pgmq.msg.sendBatch(qName, [msg1, msg2]);
+
+      await pgmq.msg.deleteBatch(qName, [id1, id2]);
+
+      const noMsg = await pgmq.msg.read<string>(qName);
+      expect(noMsg).toBeUndefined();
+    });
+
+    it("does not return non existing message ids", async () => {
+      const msg = "msg";
+      const id = await pgmq.msg.send(qName, msg);
+
+      const deleted = await pgmq.msg.deleteBatch(qName, [id, 2, 3, 4, 5]);
+
+      expect(deleted).toEqual([id]);
+    });
+
+    it("returns an empty array if no such message ids", async () => {
+      const deleted = await pgmq.msg.deleteBatch(qName, [1, 2, 3, 4, 5]);
+      expect(deleted).toEqual([]);
+    });
+  });
+
   afterEach(async () => {
     await pgmq.queue.drop(qName);
   });
