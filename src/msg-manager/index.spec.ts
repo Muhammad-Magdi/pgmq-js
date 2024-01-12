@@ -180,6 +180,51 @@ describe("MsgManager", () => {
     });
   });
 
+  describe("archive", () => {
+    it("returns true if message is archived", async () => {
+      const id = await pgmq.msg.send(qName, "msg");
+      const archived = await pgmq.msg.archive(qName, id);
+      expect(archived).toBe(true);
+    });
+
+    it("archives the message so that it can't be read again", async () => {
+      const id = await pgmq.msg.send(qName, "msg");
+      await pgmq.msg.archive(qName, id);
+      await expectEmptyQueue(qName);
+    });
+
+    it("returns false if no such message id", async () => {
+      const archived = await pgmq.msg.archive(qName, 1);
+      expect(archived).toBe(false);
+    });
+  });
+
+  describe("archiveBatch", () => {
+    it("returns the message ids that were archived", async () => {
+      const [id1, id2] = await pgmq.msg.sendBatch(qName, ["msg1", "msg2"]);
+      const [aId1, aId2] = await pgmq.msg.archiveBatch(qName, [id1, id2]);
+      expect(aId1).toBe(id1);
+      expect(aId2).toBe(id2);
+    });
+
+    it("archives the messages so that they can't be read again", async () => {
+      const [id1, id2] = await pgmq.msg.sendBatch(qName, ["msg1", "msg2"]);
+      await pgmq.msg.archiveBatch(qName, [id1, id2]);
+      await expectEmptyQueue(qName);
+    });
+
+    it("does not archive message ids that don't exist", async () => {
+      const id = await pgmq.msg.send(qName, "msg");
+      const archived = await pgmq.msg.archiveBatch(qName, [id, 2]);
+      expect(archived).toEqual([id]);
+    });
+
+    it("returns an empty array if no such message ids", async () => {
+      const ids = await pgmq.msg.archiveBatch(qName, [1, 2]);
+      expect(ids).toEqual([]);
+    });
+  });
+
   describe("delete", () => {
     it("returns true if message is deleted", async () => {
       const msg = "msg";

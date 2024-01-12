@@ -50,6 +50,24 @@ export class MsgManager extends QueryExecuter {
     return parseDbMessage(res.rows[0]);
   }
 
+  public async archive(q: string, msgId: number): Promise<boolean> {
+    const query = "SELECT pgmq.archive($1, $2::bigint)";
+    const res = await this.executeQuery<{ archive: boolean }>(query, [
+      q,
+      msgId,
+    ]);
+    return res.rows[0].archive;
+  }
+
+  public async archiveBatch(q: string, msgIds: number[]): Promise<number[]> {
+    const query = "SELECT pgmq.archive($1, $2::bigint[])";
+    const res = await this.executeQuery<{ archive: number }>(query, [
+      q,
+      msgIds,
+    ]);
+    return res.rows.flatMap((a) => a.archive);
+  }
+
   public async delete(q: string, msgId: number): Promise<boolean> {
     const query = "SELECT pgmq.delete($1, $2::bigint)";
     const res = await this.executeQuery<{ delete: boolean }>(query, [q, msgId]);
