@@ -1,5 +1,7 @@
 import { Client } from "pg";
 import Pool from "pg-pool";
+import { parseDbMessage } from "./helpers";
+import { DbMessage, Message } from "src/msg-manager/types";
 import { QueryExecuter } from "src/query-executer";
 
 export class MsgManager extends QueryExecuter {
@@ -26,6 +28,20 @@ export class MsgManager extends QueryExecuter {
     ]);
 
     return res.rows.flatMap((s) => s.send_batch);
+  }
+
+  public async read<T>(q: string, vt = 0): Promise<Message<T>> {
+    return this.readBatch<T>(q, vt, 1).then((msgs) => msgs[0]);
+  }
+
+  public async readBatch<T>(
+    q: string,
+    vt: number,
+    numMessages: number
+  ): Promise<Message<T>[]> {
+    const query = "SELECT * FROM pgmq.read($1, $2, $3)";
+    const res = await this.executeQuery<DbMessage>(query, [q, vt, numMessages]);
+    return res.rows.flatMap(parseDbMessage<T>);
   }
 
   public async delete(q: string, msgId: number): Promise<boolean> {

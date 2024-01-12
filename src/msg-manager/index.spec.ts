@@ -40,6 +40,14 @@ describe("MsgManager", () => {
     { msg: undefined, type: "undefined" },
   ];
 
+  const newMsg = <T>(msg: T) => ({
+    enqueuedAt: expect.any(Date),
+    message: msg,
+    msgId: expect.any(Number),
+    readCount: expect.any(Number),
+    vt: expect.any(Date),
+  });
+
   describe("send", () => {
     it.each(inputMsgs)("accepts $msg ($type) as a message", async ({ msg }) => {
       await pgmq.msg.send(qName, msg);
@@ -63,6 +71,114 @@ describe("MsgManager", () => {
     it("accepts empty arrays", async () => {
       const id = await pgmq.msg.sendBatch(qName, []);
       expect(id).toEqual([]);
+    });
+  });
+
+  describe("read", () => {
+    it("returns a message with its metadata", async () => {
+      const qName = faker.string.alpha(10);
+      await pgmq.queue.create(qName);
+      type T = { id: number; msg: string; date: Date; isGood: boolean };
+      const msg = { id: 1, msg: "msg", isGood: true };
+      await pgmq.msg.send(qName, msg);
+
+      const readMsg = await pgmq.msg.read<T>(qName);
+
+      expect(readMsg).toEqual(newMsg(msg));
+
+      await pgmq.queue.drop(qName);
+    });
+
+    it("returns undefined; queue is empty", async () => {
+      const emptyQName = faker.string.alpha(10);
+      await pgmq.queue.create(emptyQName);
+
+      const msg = await pgmq.msg.read(emptyQName);
+
+      expect(msg).toEqual(undefined);
+
+      await pgmq.queue.drop(emptyQName);
+    });
+
+    it("returns undefined; all the messages are read", async () => {
+      const qName = faker.string.alpha(10);
+      await pgmq.queue.create(qName);
+      await pgmq.msg.sendBatch(qName, [1, 2]);
+
+      const msg1 = await pgmq.msg.read<number>(qName);
+      await deleteMessage(qName, msg1.msgId);
+      const msg2 = await pgmq.msg.read<number>(qName);
+      await deleteMessage(qName, msg2.msgId);
+      const msg3 = await pgmq.msg.read<number>(qName);
+
+      expect(msg1).toEqual(newMsg(1));
+      expect(msg2).toEqual(newMsg(2));
+      expect(msg3).toEqual(undefined);
+
+      await pgmq.queue.drop(qName);
+    });
+
+    it('does not read a read message within the "vt" window', async () => {
+      const delay = (ms: number) =>
+        new Promise((resolve) => setTimeout(resolve, ms));
+
+      const qName = faker.string.alpha(10);
+      await pgmq.queue.create(qName);
+      type T = { id: number; msg: string; date: Date; isGood: boolean };
+      const msg = { id: 1, msg: "msg", isGood: true };
+      await pgmq.msg.send(qName, msg);
+      const vt = 1;
+
+      const readMsg = await pgmq.msg.read<T>(qName, vt);
+      expect(readMsg).toEqual(newMsg(msg));
+      const noMsg = await pgmq.msg.read<T>(qName, vt);
+      expect(noMsg).toBeUndefined();
+      await delay(vt * 1000);
+      const readMsg2 = await pgmq.msg.read<T>(qName, vt);
+      expect(readMsg2).toEqual(newMsg(msg));
+
+      await pgmq.queue.drop(qName);
+    });
+
+    it('rejects floating points in the "vt" window', async () => {
+      const qName = faker.string.alpha(10);
+      await pgmq.queue.create(qName);
+      type T = { id: number; msg: string; date: Date; isGood: boolean };
+      const msg = { id: 1, msg: "msg", isGood: true };
+      await pgmq.msg.send(qName, msg);
+
+      await expect(() => pgmq.msg.read<T>(qName, 1.5)).rejects.toThrow();
+
+      await pgmq.queue.drop(qName);
+    });
+  });
+
+  describe("readBatch", () => {
+    it("returns an array of messages with their metadata", async () => {
+      const qName = faker.string.alpha(10);
+      await pgmq.queue.create(qName);
+      type T = { id: number; msg: string; date: Date; isGood: boolean };
+      const msg1 = { id: 1, msg: "msg", isGood: true };
+      const msg2 = { id: 1, msg: "msg", isGood: true };
+      await pgmq.msg.sendBatch(qName, [msg1, msg2]);
+
+      const [readMsg1, readMsg2] = await pgmq.msg.readBatch<T>(qName, 0, 2);
+
+      expect(readMsg1).toEqual(newMsg(msg1));
+      expect(readMsg2).toEqual(newMsg(msg2));
+
+      await pgmq.queue.drop(qName);
+    });
+
+    it("returns an empty array; queue is empty", async () => {
+      const qName = faker.string.alpha(10);
+      await pgmq.queue.create(qName);
+
+      const msgs = await pgmq.msg.readBatch<number>(qName, 0, 2);
+
+      expect(msgs).toEqual([]);
+
+      await pgmq.queue.drop(qName);
     });
   });
 
