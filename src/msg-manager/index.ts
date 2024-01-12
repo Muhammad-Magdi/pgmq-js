@@ -27,4 +27,10 @@ export class MsgManager extends QueryExecuter {
 
     return res.rows.flatMap((s) => s.send_batch);
   }
+
+  public async delete(q: string, msgId: number): Promise<boolean> {
+    const query = "SELECT pgmq.delete($1, $2::bigint)";
+    const res = await this.executeQuery<{ delete: boolean }>(query, [q, msgId]);
+    return res.rows[0].delete;
+  }
 }
