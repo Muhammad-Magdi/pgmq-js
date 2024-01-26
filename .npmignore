@@ -1,0 +1,12 @@
+.github
+.vscode
+coverage
+node_modules
+src
+.eslintrc.js
+.prettierignore
+.prettierrc
+Dockerfile
+tsconfig.json
+tsconfig.tsbuildinfo
+tsup.config.ts
