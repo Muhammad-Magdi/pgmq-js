@@ -19,10 +19,6 @@ describe('QueueManager', () => {
     });
   });
 
-  beforeEach(async () => {
-    await deleteAllQueues(pgmq);
-  });
-
   const newQueue = (name: string, isUnlogged = false) => ({
     name,
     isPartitioned: false,
@@ -33,6 +29,7 @@ describe('QueueManager', () => {
 
   describe('list', () => {
     it('returns an empty list; no queues', async () => {
+      await deleteAllQueues(pgmq);
       const queues = await pgmq.queue.list();
       expect(queues).toEqual([]);
     });
@@ -125,5 +122,9 @@ describe('QueueManager', () => {
       await pgmq.queue.create(qName);
       await pgmq.queue.purge(qName);
     });
+  });
+
+  afterEach(async () => {
+    await deleteAllQueues(pgmq);
   });
 });
