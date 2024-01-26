@@ -1,6 +1,6 @@
 {
   "name": "pgmq-js",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Postgres Message Queue (PSMQ) JavaScript Client Library",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -25,7 +25,7 @@
   },
   "keywords": [],
   "author": "muhammad-magdi",
-  "license": "ISC",
+  "license": "postgresql",
   "devDependencies": {
     "@faker-js/faker": "^8.3.1",
     "@types/jest": "^29.5.11",
