@@ -16,11 +16,21 @@ Postgres Message Queue (PSMQ) JavaScript Client Library
 
 ## Installation
 
+As always:
+
 ```bash
 npm i pgmq-js
 ```
 
 ## Usage
+
+First, Start a Postgres instance with the PGMQ extension installed:
+
+```bash
+docker run -d --name postgres -e POSTGRES_PASSWORD=password -p 5432:5432 quay.io/tembo/pgmq-pg:latest
+```
+
+Then:
 
 ```ts
 import { Pgmq } from 'pgmq-js';
