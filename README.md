@@ -2,6 +2,18 @@
 
 Postgres Message Queue (PSMQ) JavaScript Client Library
 
+<p>
+  <a href="https://www.npmjs.com/package/pgmq-js">
+    <img src="https://img.shields.io/npm/v/pgmq-js" alt="version"/>
+  </a>
+  <a href="https://www.npmjs.com/package/pgmq-js">
+    <img src="https://img.shields.io/npm/dw/pgmq-js" alt="weekly downloads"/>
+  </a>
+  <a href="https://github.com/Muhammad-Magdi/pgmq-js/blob/main/LICENSE">
+    <img src="https://img.shields.io/npm/l/pgmq-js" alt="license"/>
+  </a>
+</p>
+
 ## Installation
 
 ```bash
@@ -83,7 +95,3 @@ await pgmq.msg.archive(qName, msgId).catch((err) => {
   - [x] [list_queues](https://tembo-io.github.io/pgmq/api/sql/functions/#list_queues)
   - [ ] [metrics](https://tembo-io.github.io/pgmq/api/sql/functions/#metrics)
   - [ ] [metrics_all](https://tembo-io.github.io/pgmq/api/sql/functions/#metrics_all)
-
-## Contributing
-
-## License
