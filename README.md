@@ -1,4 +1,61 @@
-# pgmq-js - Postgres Message Queue (PSMQ) JavaScript Client Library
+# pgmq-js
+
+Postgres Message Queue (PSMQ) JavaScript Client Library
+
+## Installation
+
+```bash
+npm i pgmq-js
+```
+
+## Usage
+
+```ts
+import { Pgmq } from 'pgmq-js';
+
+console.log('Connecting to Postgres...');
+const pgmq = await Pgmq.new({
+  host: 'localhost',
+  database: 'postgres',
+  password: 'password',
+  port: 5432,
+  user: 'postgres',
+  ssl: false,
+}).catch((err) => {
+  console.error('Failed to connect to Postgres', err);
+});
+
+const qName = 'my_queue';
+console.log(`Creating queue ${qName}...`);
+await pgmq.queue.create(qName).catch((err) => {
+  console.error('Failed to create queue', err);
+});
+
+interface Msg {
+  id: number;
+  name: string;
+}
+const msg: Msg = { id: 1, name: 'testMsg' };
+console.log('Sending message...');
+const msgId = await pgmq.msg.send(qName, msg).catch((err) => {
+  console.error('Failed to send message', err);
+});
+
+const vt = 30;
+const receivedMsg = await pgmq.msg.read<Msg>(qName, vt).catch((err) => {
+  console.error('No messages in the queue', err);
+});
+
+console.log('Received message...');
+console.dir(receivedMsg.message, { depth: null });
+
+console.log('Archiving message...');
+await pgmq.msg.archive(qName, msgId).catch((err) => {
+  console.error('Failed to archive message', err);
+});
+```
+
+## API
 
 ## Supported Functionalities
 
@@ -26,3 +83,7 @@
   - [x] [list_queues](https://tembo-io.github.io/pgmq/api/sql/functions/#list_queues)
   - [ ] [metrics](https://tembo-io.github.io/pgmq/api/sql/functions/#metrics)
   - [ ] [metrics_all](https://tembo-io.github.io/pgmq/api/sql/functions/#metrics_all)
+
+## Contributing
+
+## License
