@@ -37,12 +37,12 @@
     "prettier": "^3.1.1",
     "ts-jest": "^29.1.1",
     "tsup": "^8.0.1",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2"
   },
   "dependencies": {
     "pg": "^8.11.3",
-    "pg-pool": "^3.6.1",
-    "ts-node": "^10.9.2"
+    "pg-pool": "^3.6.1"
   },
   "jest": {
     "moduleFileExtensions": [
