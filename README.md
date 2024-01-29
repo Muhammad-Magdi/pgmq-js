@@ -1,6 +1,6 @@
 # pgmq-js
 
-Postgres Message Queue (PSMQ) JavaScript Client Library
+Postgres Message Queue (PGMQ) JavaScript Client Library
 
 <p>
   <a href="https://www.npmjs.com/package/pgmq-js">
