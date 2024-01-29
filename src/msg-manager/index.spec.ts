@@ -7,7 +7,7 @@ describe('MsgManager', () => {
   const qName = faker.string.alpha(10);
   beforeAll(async () => {
     pgmq = await Pgmq.new({
-      host: 'pgmq',
+      host: 'localhost',
       database: 'postgres',
       password: 'password',
       port: 5432,
