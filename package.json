@@ -1,6 +1,6 @@
 {
   "name": "pgmq-js",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Postgres Message Queue (PSMQ) JavaScript Client Library",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -23,9 +23,16 @@
     "format": "prettier . --write --ignore-unknown",
     "format:check": "prettier . --check --ignore-unknown"
   },
-  "keywords": [],
+  "keywords": [
+    "postgres",
+    "postgresql",
+    "message-queue",
+    "queues",
+    "postgresql-extension",
+    "pgmq"
+  ],
   "author": "muhammad-magdi",
-  "license": "postgresql",
+  "license": "Apache 2.0",
   "devDependencies": {
     "@faker-js/faker": "^8.3.1",
     "@types/jest": "^29.5.11",
