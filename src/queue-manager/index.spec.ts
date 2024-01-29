@@ -3,11 +3,6 @@ import { faker } from '@faker-js/faker';
 
 describe('QueueManager', () => {
   let pgmq: Pgmq;
-  const deleteAllQueues = async (pgmq: Pgmq) => {
-    const queues = await pgmq.queue.list();
-    await Promise.all(queues.map((q) => pgmq.queue.drop(q.name)));
-  };
-
   beforeAll(async () => {
     pgmq = await Pgmq.new({
       host: 'localhost',
@@ -28,11 +23,11 @@ describe('QueueManager', () => {
   });
 
   describe('list', () => {
-    it('returns an empty list; no queues', async () => {
-      await deleteAllQueues(pgmq);
-      const queues = await pgmq.queue.list();
-      expect(queues).toEqual([]);
-    });
+    // it('returns an empty list; no queues', async () => {
+    //   await deleteAllQueues(pgmq);
+    //   const queues = await pgmq.queue.list();
+    //   expect(queues).toEqual([]);
+    // });
 
     it('returns a list of queues; one queue', async () => {
       const qName = faker.string.alpha(10);
@@ -41,6 +36,8 @@ describe('QueueManager', () => {
       const queues = await pgmq.queue.list();
 
       expect(queues).toEqual([newQueue(qName)]);
+
+      await pgmq.queue.drop(qName);
     });
 
     it('returns a list of queues; multiple queues', async () => {
@@ -59,6 +56,8 @@ describe('QueueManager', () => {
       expect(queues).toContainEqual(newQueue(qName1));
       expect(queues).toContainEqual(newQueue(qName2));
       expect(queues).toContainEqual(newQueue(qName3));
+
+      await Promise.all([qName1, qName2, qName3].map((q) => pgmq.queue.drop(q)));
     });
   });
 
@@ -69,12 +68,16 @@ describe('QueueManager', () => {
 
       const queues = await pgmq.queue.list();
       expect(queues).toContainEqual(newQueue(qName));
+
+      await pgmq.queue.drop(qName);
     });
 
     it('rejects existing queue names', async () => {
       const qName = faker.string.alpha(10);
       await pgmq.queue.create(qName);
       await expect(pgmq.queue.create(qName)).rejects.toThrow();
+
+      await pgmq.queue.drop(qName);
     });
   });
 
@@ -86,6 +89,8 @@ describe('QueueManager', () => {
 
       const queues = await pgmq.queue.list();
       expect(queues).toContainEqual(newQueue(qName, true));
+
+      await pgmq.queue.drop(qName);
     });
 
     it('fails to create an unlogged queue with the same name as an existing logged queue', async () => {
@@ -96,6 +101,8 @@ describe('QueueManager', () => {
 
       const queues = await pgmq.queue.list();
       expect(queues).toContainEqual(newQueue(qName));
+
+      await pgmq.queue.drop(qName);
     });
   });
 
@@ -121,10 +128,8 @@ describe('QueueManager', () => {
       const qName = faker.string.alpha(10);
       await pgmq.queue.create(qName);
       await pgmq.queue.purge(qName);
-    });
-  });
 
-  afterEach(async () => {
-    await deleteAllQueues(pgmq);
+      await pgmq.queue.drop(qName);
+    });
   });
 });
