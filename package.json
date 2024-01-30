@@ -17,7 +17,7 @@
     "start": "ts-node src/index.ts",
     "test": "jest",
     "test:watch": "jest --watch --detectOpenHandles",
-    "test:cov": "jest --coverage --detectOpenHandles",
+    "test:cov": "jest --coverage",
     "lint": "eslint . --fix",
     "lint:check": "eslint . --quiet",
     "format": "prettier . --write --ignore-unknown",

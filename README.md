@@ -12,6 +12,9 @@ Postgres Message Queue (PGMQ) JavaScript Client Library
   <a href="https://github.com/Muhammad-Magdi/pgmq-js/blob/main/LICENSE">
     <img src="https://img.shields.io/npm/l/pgmq-js" alt="license"/>
   </a>
+  <a href="https://codecov.io/gh/Muhammad-Magdi/pgmq-js" > 
+    <img src="https://codecov.io/gh/Muhammad-Magdi/pgmq-js/graph/badge.svg?token=ZOC1HSGGC7"/> 
+  </a>
 </p>
 
 ## Installation
