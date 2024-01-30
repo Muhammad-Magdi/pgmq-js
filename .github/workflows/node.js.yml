@@ -7,7 +7,7 @@ on:
     branches: ['main']
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     services:
@@ -31,4 +31,7 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm test --runInBand
-      - run: npm run build
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
