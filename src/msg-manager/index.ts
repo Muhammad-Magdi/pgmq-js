@@ -59,4 +59,14 @@ export class MsgManager extends QueryExecuter {
     const res = await this.executeQuery<{ delete: number }>(query, [q, msgIds]);
     return res.rows.flatMap((d) => d.delete);
   }
+
+  public async setVt<T>(
+    q: string,
+    msgId: number,
+    vtOffset: number,
+  ): Promise<Message<T> | undefined> {
+    const query = 'SELECT * FROM pgmq.set_vt($1, $2, $3);';
+    const res = await this.executeQuery<DbMessage>(query, [q, msgId, vtOffset]);
+    return parseDbMessage<T>(res.rows[0]);
+  }
 }
