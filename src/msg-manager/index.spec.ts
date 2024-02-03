@@ -315,6 +315,42 @@ describe('MsgManager', () => {
     });
   });
 
+  describe('setVt', () => {
+    it('sets the vt', async () => {
+      const msgId = await pgmq.msg.send(qName, 'msg');
+      const msg = await pgmq.msg.setVt(qName, msgId, 30);
+
+      expect(msg).toBeDefined();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      expect(msg!.vt.valueOf()).toBeCloseTo(new Date().valueOf() + 30 * 1000, -3);
+    });
+
+    it('does not increment the vt when called twice; but resets it', async () => {
+      const msgId = await pgmq.msg.send(qName, 'msg');
+      const msg = await pgmq.msg.setVt(qName, msgId, 10);
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      expect(msg!.vt.valueOf()).toBeCloseTo(new Date().valueOf() + 10 * 1000, -3);
+    });
+
+    it('returns the message', async () => {
+      const msgId = await pgmq.msg.send(qName, 'msg');
+      const msg = await pgmq.msg.setVt<string>(qName, msgId, 30);
+
+      expect(msg).toBeDefined();
+      expect(msg?.message).toEqual('msg');
+    });
+
+    it('returns undefined when no such msgId', async () => {
+      const msg = await pgmq.msg.setVt(qName, 10000, 30);
+      expect(msg).toBeUndefined();
+    });
+
+    it('rejects when no such queue', async () => {
+      await expect(pgmq.msg.setVt('non-existing-queue', 10000, 30)).rejects.toThrow();
+    });
+  });
+
   afterEach(async () => {
     await pgmq.queue.drop(qName);
   });
