@@ -39,4 +39,10 @@ export class QueueManager extends QueryExecuter {
     const { rows } = await this.executeQuery<DbQueueMetrics>(query, [name]);
     return parseDbQueueMetrics(rows[0]);
   }
+
+  public async getAllMetrics() {
+    const query = 'SELECT * FROM pgmq.metrics_all()';
+    const { rows } = await this.executeQuery<DbQueueMetrics>(query);
+    return rows.map(parseDbQueueMetrics);
+  }
 }
