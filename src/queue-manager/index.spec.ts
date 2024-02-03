@@ -177,4 +177,45 @@ describe('QueueManager', () => {
       await expect(pgmq.queue.getMetrics(faker.string.alpha(10))).rejects.toThrow();
     });
   });
+
+  describe('getAllMetrics', () => {
+    it('returns empty metrics', async () => {
+      const metrics = await pgmq.queue.getAllMetrics();
+      expect(metrics).toEqual([]);
+    });
+
+    it('returns metrics of a single queue', async () => {
+      const qName = faker.string.alpha(10);
+      await pgmq.queue.create(qName);
+      await pgmq.msg.sendBatch(qName, ['msg1', { key: 'msg2' }, 3, 4.0]);
+
+      const metrics = await pgmq.queue.getAllMetrics();
+
+      expect(metrics).toEqual([
+        {
+          queueName: qName,
+          queueLength: 4,
+          scrapeTime: expect.any(Date) as Date,
+          newestMsgAgeSec: expect.closeTo(0, -1) as number,
+          oldestMsgAgeSec: expect.closeTo(0, -1) as number,
+          totalMessages: 4,
+        },
+      ]);
+
+      await pgmq.queue.drop(qName);
+    });
+
+    it('returns metrics of multiple queues', async () => {
+      const qName1 = faker.string.alpha(10);
+      const qName2 = faker.string.alpha(10);
+      await Promise.all([pgmq.queue.create(qName1), pgmq.queue.create(qName2)]);
+
+      const metrics = await pgmq.queue.getAllMetrics();
+
+      expect(metrics).toContainEqual(emptyQueueMetrics(qName1));
+      expect(metrics).toContainEqual(emptyQueueMetrics(qName2));
+
+      await Promise.all([pgmq.queue.drop(qName1), pgmq.queue.drop(qName2)]);
+    });
+  });
 });
