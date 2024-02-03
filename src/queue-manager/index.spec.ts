@@ -131,4 +131,50 @@ describe('QueueManager', () => {
       await pgmq.queue.drop(qName);
     });
   });
+
+  const emptyQueueMetrics = (qName: string) => ({
+    queueName: qName,
+    queueLength: 0,
+    scrapeTime: expect.any(Date) as Date,
+    newestMsgAgeSec: undefined,
+    oldestMsgAgeSec: undefined,
+    totalMessages: 0,
+  });
+
+  describe('getMetrics', () => {
+    it('returns empty queue metrics', async () => {
+      const qName = faker.string.alpha(10);
+      await pgmq.queue.create(qName);
+
+      const metrics = await pgmq.queue.getMetrics(qName);
+
+      expect(metrics).toEqual(emptyQueueMetrics(qName));
+      expect(metrics.scrapeTime.valueOf()).toBeCloseTo(Date.now(), -2);
+
+      await pgmq.queue.drop(qName);
+    });
+
+    it('returns queue metrics', async () => {
+      const qName = faker.string.alpha(10);
+      await pgmq.queue.create(qName);
+      await pgmq.msg.sendBatch(qName, ['msg1', { key: 'msg2' }, 3, 4.0]);
+
+      const metrics = await pgmq.queue.getMetrics(qName);
+
+      expect(metrics).toEqual({
+        queueName: qName,
+        queueLength: 4,
+        scrapeTime: expect.any(Date) as Date,
+        newestMsgAgeSec: expect.closeTo(0, -1) as number,
+        oldestMsgAgeSec: expect.closeTo(0, -1) as number,
+        totalMessages: 4,
+      });
+
+      await pgmq.queue.drop(qName);
+    });
+
+    it('rejects when queue does not exist', async () => {
+      await expect(pgmq.queue.getMetrics(faker.string.alpha(10))).rejects.toThrow();
+    });
+  });
 });
