@@ -354,4 +354,8 @@ describe('MsgManager', () => {
   afterEach(async () => {
     await pgmq.queue.drop(qName);
   });
+
+  afterAll(async () => {
+    await pgmq.close();
+  });
 });

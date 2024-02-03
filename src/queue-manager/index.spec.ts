@@ -218,4 +218,8 @@ describe('QueueManager', () => {
       await Promise.all([pgmq.queue.drop(qName1), pgmq.queue.drop(qName2)]);
     });
   });
+
+  afterAll(async () => {
+    await pgmq.close();
+  });
 });
