@@ -1,6 +1,6 @@
-import { parseDbQueue } from './helpers';
-import { Queue } from './types';
-import { QueryExecuter } from 'src/query-executer';
+import { parseDbQueue, parseDbQueueMetrics } from './helpers';
+import { DbQueueMetrics, Queue } from './types';
+import { QueryExecuter } from '../query-executer';
 
 export class QueueManager extends QueryExecuter {
   public async list(): Promise<Queue[]> {
@@ -32,5 +32,11 @@ export class QueueManager extends QueryExecuter {
   public async detachArchive(name: string) {
     const query = 'SELECT pgmq.detach_archive($1)';
     await this.executeQuery(query, [name]);
+  }
+
+  public async getMetrics(name: string) {
+    const query = 'SELECT * FROM pgmq.metrics($1);';
+    const { rows } = await this.executeQuery<DbQueueMetrics>(query, [name]);
+    return parseDbQueueMetrics(rows[0]);
   }
 }

@@ -106,5 +106,5 @@ await pgmq.msg.archive(qName, msgId).catch((err) => {
 - [ ] [Utilities](https://tembo-io.github.io/pgmq/api/sql/functions/#utilities)
   - [x] [set_vt](https://tembo-io.github.io/pgmq/api/sql/functions/#set_vt)
   - [x] [list_queues](https://tembo-io.github.io/pgmq/api/sql/functions/#list_queues)
-  - [ ] [metrics](https://tembo-io.github.io/pgmq/api/sql/functions/#metrics)
+  - [x] [metrics](https://tembo-io.github.io/pgmq/api/sql/functions/#metrics)
   - [ ] [metrics_all](https://tembo-io.github.io/pgmq/api/sql/functions/#metrics_all)
