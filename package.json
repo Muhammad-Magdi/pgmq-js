@@ -15,9 +15,9 @@
   "scripts": {
     "build": "tsup",
     "start": "ts-node src/index.ts",
-    "test": "jest",
-    "test:watch": "jest --watch --detectOpenHandles",
-    "test:cov": "jest --coverage",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch --detectOpenHandles --runInBand",
+    "test:cov": "jest --coverage --runInBand",
     "lint": "eslint . --fix",
     "lint:check": "eslint . --quiet",
     "format": "prettier . --write --ignore-unknown",
