@@ -30,13 +30,21 @@ export class Pgmq {
 
     const pool = new Pool(c);
 
-    await pool.connect();
     const pgmq = new Pgmq(pool);
     await pgmq.prepare();
     return pgmq;
   }
 
   private async prepare() {
-    await this.pool.query('CREATE EXTENSION IF NOT EXISTS pgmq CASCADE;');
+    const client = await this.pool.connect();
+    try {
+      await client.query('CREATE EXTENSION IF NOT EXISTS pgmq CASCADE;');
+    } finally {
+      client.release();
+    }
+  }
+
+  public async close() {
+    await this.pool.end();
   }
 }
