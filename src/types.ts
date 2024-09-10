@@ -10,3 +10,7 @@ export interface PgPoolConfig {
   connectionTimeoutMillis?: number;
   maxUses?: number;
 }
+
+export interface PgmqConfig {
+  skipExtensionCreation?: boolean;
+}

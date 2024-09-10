@@ -7,6 +7,7 @@ import {
   DEFAULT_MAX_POOL_SIZE,
   DEFAULT_MAX_USES,
   DEFAULT_SSL,
+  defaultPgmqConfig,
 } from './constants';
 import { QueueManager } from './queue-manager';
 import { MsgManager } from './msg-manager';
@@ -20,7 +21,7 @@ export class Pgmq {
     this.msg = new MsgManager(pool);
   }
 
-  public static async new(c: PgPoolConfig) {
+  public static async new(c: PgPoolConfig, pgmqConfig = defaultPgmqConfig) {
     if (c.max === undefined) c.max = DEFAULT_MAX_POOL_SIZE;
     if (c.idleTimeoutMillis === undefined) c.max = DEFAULT_IDLE_TIMEOUT_MILLIS;
     if (c.connectionTimeoutMillis === undefined)
@@ -31,7 +32,8 @@ export class Pgmq {
     const pool = new Pool(c);
 
     const pgmq = new Pgmq(pool);
-    await pgmq.prepare();
+    if (!pgmqConfig.skipExtensionCreation) await pgmq.prepare();
+
     return pgmq;
   }
 
