@@ -30,7 +30,7 @@ npm i pgmq-js
 First, Start a Postgres instance with the PGMQ extension installed:
 
 ```bash
-docker run -d --name postgres -e POSTGRES_PASSWORD=password -p 5432:5432 quay.io/tembo/pgmq-pg:latest
+docker run -d --name postgres -e POSTGRES_PASSWORD=password -p 5432:5432 quay.io/tembo/pgmq-pg:v1.2.1
 ```
 
 Then:

@@ -10,7 +10,7 @@ jobs:
 
     services:
       pgmq:
-        image: quay.io/tembo/pgmq-pg:latest
+        image: quay.io/tembo/pgmq-pg:v1.2.1
         env:
           POSTGRES_PASSWORD: password
         options: >-
