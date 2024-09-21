@@ -39,14 +39,17 @@ Then:
 import { Pgmq } from 'pgmq-js';
 
 console.log('Connecting to Postgres...');
-const pgmq = await Pgmq.new({
-  host: 'localhost',
-  database: 'postgres',
-  password: 'password',
-  port: 5432,
-  user: 'postgres',
-  ssl: false,
-}).catch((err) => {
+const pgmq = await Pgmq.new(
+  {
+    host: 'localhost',
+    database: 'postgres',
+    password: 'password',
+    port: 5432,
+    user: 'postgres',
+    ssl: false,
+  },
+  //  { skipExtensionCreation: true },  Set this if you want to bypass extension creation (e.g. dbdev users).
+).catch((err) => {
   console.error('Failed to connect to Postgres', err);
 });
 
