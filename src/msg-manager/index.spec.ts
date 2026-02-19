@@ -64,6 +64,13 @@ describe('MsgManager', () => {
       const id = await pgmq.msg.send(qName, 'msg');
       await deleteMessage(qName, id);
     });
+
+    it('accepts a delay parameter', async () => {
+      const id = await pgmq.msg.send(qName, 'delayed-msg', 5);
+      expect(id).toEqual(expect.any(Number));
+      const msg = await pgmq.msg.read(qName);
+      expect(msg).toBeUndefined();
+    });
   });
 
   describe('sendBatch', () => {
